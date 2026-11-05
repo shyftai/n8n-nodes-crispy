@@ -60,7 +60,7 @@ export const conversationOperations: INodeProperties[] = [
 				routing: {
 					request: {
 						method: 'GET',
-						url: '=/api/v1/inbox/conversations/{{$parameter.chatId.value}}/messages',
+						url: '=/api/v1/inbox/conversations/{{encodeURIComponent($parameter.chatId.value || $parameter.chatId)}}/messages',
 					},
 					output: {
 						postReceive: [simplifyPostReceive(10)],
@@ -75,7 +75,7 @@ export const conversationOperations: INodeProperties[] = [
 				routing: {
 					request: {
 						method: 'POST',
-						url: '=/api/v1/inbox/conversations/{{$parameter.chatId.value}}/messages',
+						url: '=/api/v1/inbox/conversations/{{encodeURIComponent($parameter.chatId.value || $parameter.chatId)}}/messages',
 					},
 					output: {
 						postReceive: [rawListPostReceive()],
@@ -120,9 +120,10 @@ export const conversationOperations: INodeProperties[] = [
 		displayOptions: { show: showOnlyForSendMessage },
 		description: 'The message text to send (up to 8000 characters). Either this or Voice Note URL is required.',
 		placeholder: 'EXAMPLE reply text',
-		routing: {
-			send: { type: 'body', property: 'text' },
-		},
+		// Intentionally no `routing.send` here: an empty text value must NOT be
+		// sent in the body when the user is sending a voice-note-only message.
+		// See the preSend function below (in additionalFieldsSendMessage's
+		// routing), which only adds `text` to the body when it's non-empty.
 	},
 	{
 		displayName: 'Simplify',
@@ -237,12 +238,29 @@ export const conversationOperations: INodeProperties[] = [
 						this: IExecuteSingleFunctions,
 						requestOptions: IHttpRequestOptions,
 					): Promise<IHttpRequestOptions> {
+						// Only include `text` in the body when it is non-empty: the API
+						// allows sending ONLY a voice note, and sending `"text": ""`
+						// alongside voice_note_url would be wrong/misleading.
+						const text = this.getNodeParameter('text', '') as string;
+						if (text) {
+							requestOptions.body = {
+								...((requestOptions.body as object) ?? {}),
+								text,
+							};
+						}
+						return requestOptions;
+					},
+					async function (
+						this: IExecuteSingleFunctions,
+						requestOptions: IHttpRequestOptions,
+					): Promise<IHttpRequestOptions> {
 						const additionalFields = this.getNodeParameter('additionalFieldsSendMessage', {}) as {
-							attachmentsJson?: string;
+							attachmentsJson?: string | unknown[];
 						};
 						if (additionalFields.attachmentsJson) {
 							try {
-								const parsed = JSON.parse(additionalFields.attachmentsJson);
+								const raw = additionalFields.attachmentsJson;
+								const parsed = typeof raw === 'string' ? JSON.parse(raw) : raw;
 								if (Array.isArray(parsed) && parsed.length > 0) {
 									requestOptions.body = {
 										...((requestOptions.body as object) ?? {}),

@@ -107,6 +107,22 @@ export function rawListPostReceive() {
  * Returns the raw response body as a single n8n item, with no JSON
  * assumptions. Used for routes (like Contact → Get Many) whose success
  * response can be a non-JSON body such as CSV text.
+ *
+ * Investigated for SHY-1727 finding 6: `items` here is NOT upstream workflow
+ * input data. n8n-core's RoutingNode.postProcessResponseData() (in
+ * n8n-core/dist/execution-engine/routing-node.js, matching the n8n-workflow
+ * version in this repo's peer dependency) initializes
+ * `returnData = [{ json: responseData.body }]` BEFORE invoking any
+ * `postReceive` action, then RoutingNode.runPostReceiveAction()'s
+ * `typeof action === 'function'` branch calls our function as
+ * `action.call(executeSingleFunctions, returnData, responseData)`. Since this
+ * route's `postReceive` array contains only this one function, `items` it
+ * receives is exactly `[{ json: response.body }]` — already a one-element
+ * array wrapping the real response body, not literal upstream node input
+ * items. `items.length > 0` is therefore always true here, and `items` always
+ * reflects the current response body correctly, so returning `items` in that
+ * branch is equivalent to deriving fresh from `body` directly. No behavior
+ * change needed for this function.
  */
 export async function rawBodyPostReceive(
 	this: IExecuteSingleFunctions,

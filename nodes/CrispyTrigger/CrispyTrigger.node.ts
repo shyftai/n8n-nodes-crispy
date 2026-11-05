@@ -264,7 +264,10 @@ export class CrispyTrigger implements INodeType {
 						} as IHttpRequestOptions,
 					)) as IDataObject;
 
-					const confirmToken = preview?.confirm_token as string | undefined;
+					const confirmToken =
+						(preview?.confirm_token as string | undefined) ??
+						((preview?.data as IDataObject)?.confirm_token as string | undefined) ??
+						((preview?.result as IDataObject)?.confirm_token as string | undefined);
 					if (confirmToken) {
 						await this.helpers.httpRequestWithAuthentication.call(this, 'crispyApi', {
 							method: 'DELETE',
@@ -272,6 +275,10 @@ export class CrispyTrigger implements INodeType {
 							qs: { confirm_token: confirmToken },
 							json: true,
 						} as IHttpRequestOptions);
+					} else {
+						this.logger.warn(
+							`Crispy Trigger webhook ${webhookId}: no confirm_token was found in the delete preview response (checked top level, "data", and "result") — skipping the second confirm call. The webhook subscription may still exist on Crispy's side even though local webhook data was cleared.`,
+						);
 					}
 				} catch (error) {
 					// Deactivating a workflow should not hard-fail just because the
@@ -310,8 +317,11 @@ export class CrispyTrigger implements INodeType {
 			}
 		} else {
 			this.logger.warn(
-				'Crispy Trigger has no stored signing secret for this webhook (it may have been created before this version, or static data was reset) — skipping signature verification. Deactivate and reactivate the trigger to get a verifiable secret.',
+				'Crispy Trigger has no stored signing secret for this webhook (it may have been created before this version, or static data was reset) — rejecting this delivery because the signature cannot be verified. Deactivate and reactivate the trigger to get a verifiable secret.',
 			);
+			const res = this.getResponseObject();
+			res.status(401).send('Unauthorized').end();
+			return { noWebhookResponse: true };
 		}
 
 		const bodyData = this.getBodyData() as IDataObject;
