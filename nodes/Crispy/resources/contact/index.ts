@@ -117,14 +117,14 @@ export const contactOperations: INodeProperties[] = [
 						requestOptions: IHttpRequestOptions,
 					): Promise<IHttpRequestOptions> {
 						const additionalFields = this.getNodeParameter('additionalFields', {}) as {
-							customAttrsJson?: string;
+							customAttrsJson?: string | Record<string, unknown>;
 						};
 						if (additionalFields.customAttrsJson) {
 							try {
-								const parsed = JSON.parse(additionalFields.customAttrsJson) as Record<
-									string,
-									string
-								>;
+								const raw = additionalFields.customAttrsJson;
+								const parsed = (
+									typeof raw === 'string' ? JSON.parse(raw) : raw
+								) as Record<string, string>;
 								requestOptions.qs = requestOptions.qs ?? {};
 								for (const [key, value] of Object.entries(parsed)) {
 									requestOptions.qs[`custom_attrs[${key}]`] = value;

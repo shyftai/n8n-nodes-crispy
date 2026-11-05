@@ -111,7 +111,7 @@ export const personOperations: INodeProperties[] = [
 					): Promise<IHttpRequestOptions> {
 						const additionalFields = this.getNodeParameter('additionalFields', {}) as {
 							limit?: number;
-							extraQueryParametersJson?: string;
+							extraQueryParametersJson?: string | Record<string, unknown>;
 						};
 						requestOptions.qs = requestOptions.qs ?? {};
 						if (additionalFields.limit) {
@@ -119,7 +119,8 @@ export const personOperations: INodeProperties[] = [
 						}
 						if (additionalFields.extraQueryParametersJson) {
 							try {
-								const parsed = JSON.parse(additionalFields.extraQueryParametersJson);
+								const raw = additionalFields.extraQueryParametersJson;
+								const parsed = typeof raw === 'string' ? JSON.parse(raw) : raw;
 								if (parsed && typeof parsed === 'object') {
 									Object.assign(requestOptions.qs, parsed);
 								}

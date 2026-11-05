@@ -46,7 +46,7 @@ export const listOperations: INodeProperties[] = [
 				routing: {
 					request: {
 						method: 'GET',
-						url: '=/api/v1/lists/{{$parameter.listId.value}}/contacts',
+						url: '=/api/v1/lists/{{encodeURIComponent($parameter.listId.value || $parameter.listId)}}/contacts',
 					},
 					output: {
 						postReceive: [simplifyPostReceive(10)],
@@ -61,7 +61,7 @@ export const listOperations: INodeProperties[] = [
 				routing: {
 					request: {
 						method: 'POST',
-						url: '=/api/v1/lists/{{$parameter.listId.value}}/contacts',
+						url: '=/api/v1/lists/{{encodeURIComponent($parameter.listId.value || $parameter.listId)}}/contacts',
 					},
 					output: {
 						postReceive: [rawListPostReceive()],

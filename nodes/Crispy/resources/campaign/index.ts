@@ -46,7 +46,7 @@ export const campaignOperations: INodeProperties[] = [
 				routing: {
 					request: {
 						method: 'GET',
-						url: '=/api/v1/campaigns/{{$parameter.campaignId.value}}',
+						url: '=/api/v1/campaigns/{{encodeURIComponent($parameter.campaignId.value || $parameter.campaignId)}}',
 					},
 					output: {
 						postReceive: [simplifyPostReceive(10)],
@@ -61,7 +61,7 @@ export const campaignOperations: INodeProperties[] = [
 				routing: {
 					request: {
 						method: 'GET',
-						url: '=/api/v1/campaigns/{{$parameter.campaignId.value}}/stats',
+						url: '=/api/v1/campaigns/{{encodeURIComponent($parameter.campaignId.value || $parameter.campaignId)}}/stats',
 					},
 					output: {
 						postReceive: [simplifyPostReceive(10)],
