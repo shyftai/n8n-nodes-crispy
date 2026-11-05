@@ -1,0 +1,43 @@
+{
+  "name": "n8n-nodes-crispy",
+  "version": "0.1.0",
+  "description": "n8n community nodes for Crispy, the LinkedIn automation API — search, profiles, contacts, lists, campaigns, inbox messaging, invitations, and real-time webhooks.",
+  "license": "MIT",
+  "homepage": "https://crispy.sh",
+  "keywords": ["n8n-community-node-package", "crispy", "linkedin"],
+  "author": { "name": "Daniel Pruijssers", "email": "daan@shyft.ai" },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/shyftai/n8n-nodes-crispy.git"
+  },
+  "bugs": {
+    "url": "https://github.com/shyftai/n8n-nodes-crispy/issues"
+  },
+  "scripts": {
+    "build": "n8n-node build",
+    "build:watch": "tsc --watch",
+    "dev": "n8n-node dev",
+    "lint": "n8n-node lint",
+    "lint:fix": "n8n-node lint --fix",
+    "release": "n8n-node release",
+    "prepublishOnly": "n8n-node prerelease"
+  },
+  "files": ["dist"],
+  "n8n": {
+    "n8nNodesApiVersion": 1,
+    "strict": true,
+    "credentials": ["dist/credentials/CrispyApi.credentials.js"],
+    "nodes": [
+      "dist/nodes/Crispy/Crispy.node.js",
+      "dist/nodes/CrispyTrigger/CrispyTrigger.node.js"
+    ]
+  },
+  "devDependencies": {
+    "@n8n/node-cli": "^0.55.5",
+    "eslint": "9.32.0",
+    "prettier": "3.6.2",
+    "release-it": "^21.1.0",
+    "typescript": "5.9.2"
+  },
+  "peerDependencies": { "n8n-workflow": "*" }
+}

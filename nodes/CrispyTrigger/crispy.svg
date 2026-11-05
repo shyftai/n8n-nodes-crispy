@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120" role="img" aria-label="Crispy">
+  <!-- Crispy direction 1 (Grid). Equilateral chip on a construction grid; solid silhouette, house gradient. -->
+  <defs><linearGradient id="crispy-d1-grad" gradientUnits="userSpaceOnUse" x1="86.55" y1="4" x2="55.3" y2="89.88"><stop offset="0" stop-color="#FBBF24"/><stop offset="1" stop-color="#D97706"/></linearGradient></defs>
+  <path fill="url(#crispy-d1-grad)" d="M87.47 9.2L103.96 102.73Q104.88 107.93 99.63 107.35A211.06 211.06 0 0 1 10.1 74.77Q5.71 71.83 9.76 68.44L82.51 7.39Q86.55 4 87.47 9.2Z"/>
+</svg>

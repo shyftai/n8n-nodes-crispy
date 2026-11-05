@@ -1,0 +1,103 @@
+{
+  "name": "Crispy Trigger (message.received) \u2192 reply",
+  "nodes": [
+    {
+      "parameters": {
+        "events": ["message.received"]
+      },
+      "type": "n8n-nodes-crispy.crispyTrigger",
+      "typeVersion": 1,
+      "position": [240, 300],
+      "id": "d290f1ee-6c54-4b01-90e6-d701748f0001",
+      "name": "Crispy Trigger",
+      "credentials": {
+        "crispyApi": {
+          "id": "EXAMPLE",
+          "name": "EXAMPLE Crispy API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "d290f1ee-6c54-4b01-90e6-d701748f0002",
+              "leftValue": "={{ $json.data.direction }}",
+              "rightValue": "inbound",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [460, 300],
+      "id": "d290f1ee-6c54-4b01-90e6-d701748f0003",
+      "name": "Only Inbound Messages"
+    },
+    {
+      "parameters": {
+        "resource": "conversation",
+        "operation": "sendMessage",
+        "chatId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "={{ $json.data.chat_id }}"
+        },
+        "text": "EXAMPLE auto-reply: thanks for your message, a human will follow up shortly."
+      },
+      "type": "n8n-nodes-crispy.crispy",
+      "typeVersion": 1,
+      "position": [680, 220],
+      "id": "d290f1ee-6c54-4b01-90e6-d701748f0004",
+      "name": "Crispy: Send Message (EXAMPLE reply)",
+      "credentials": {
+        "crispyApi": {
+          "id": "EXAMPLE",
+          "name": "EXAMPLE Crispy API"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Crispy Trigger": {
+      "main": [
+        [
+          {
+            "node": "Only Inbound Messages",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Only Inbound Messages": {
+      "main": [
+        [
+          {
+            "node": "Crispy: Send Message (EXAMPLE reply)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    }
+  },
+  "pinData": {},
+  "meta": {
+    "templateCredsSetupNeeded": true,
+    "instanceId": "EXAMPLE"
+  }
+}

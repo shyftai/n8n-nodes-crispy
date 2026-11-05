@@ -1,0 +1,87 @@
+{
+  "name": "Crispy: Person Search \u2192 List Add Contact",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [240, 300],
+      "id": "d290f1ee-6c54-4b01-90e6-d701748f0011",
+      "name": "When clicking \u2018Execute workflow\u2019"
+    },
+    {
+      "parameters": {
+        "resource": "person",
+        "operation": "search",
+        "keywords": "EXAMPLE VP Engineering",
+        "linkedinApi": "classic",
+        "additionalFields": {
+          "limit": 10
+        }
+      },
+      "type": "n8n-nodes-crispy.crispy",
+      "typeVersion": 1,
+      "position": [460, 300],
+      "id": "d290f1ee-6c54-4b01-90e6-d701748f0012",
+      "name": "Crispy: Person Search (EXAMPLE keyword)",
+      "credentials": {
+        "crispyApi": {
+          "id": "EXAMPLE",
+          "name": "EXAMPLE Crispy API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "list",
+        "operation": "addContact",
+        "listId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "EXAMPLE-list-id"
+        },
+        "contactIdentifier": "={{ $json.provider_id }}"
+      },
+      "type": "n8n-nodes-crispy.crispy",
+      "typeVersion": 1,
+      "position": [680, 300],
+      "id": "d290f1ee-6c54-4b01-90e6-d701748f0013",
+      "name": "Crispy: List Add Contact (EXAMPLE list)",
+      "credentials": {
+        "crispyApi": {
+          "id": "EXAMPLE",
+          "name": "EXAMPLE Crispy API"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "When clicking \u2018Execute workflow\u2019": {
+      "main": [
+        [
+          {
+            "node": "Crispy: Person Search (EXAMPLE keyword)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Crispy: Person Search (EXAMPLE keyword)": {
+      "main": [
+        [
+          {
+            "node": "Crispy: List Add Contact (EXAMPLE list)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "meta": {
+    "templateCredsSetupNeeded": true,
+    "instanceId": "EXAMPLE"
+  }
+}
