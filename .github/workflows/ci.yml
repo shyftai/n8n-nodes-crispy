@@ -12,6 +12,14 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  route:
+    # Kept only so the required check `route runner` still exists (merge.mjs reads required checks
+    # from the base workflow). It routes nothing: each job picks its pool from vars.LISBON_POOL.
+    name: route runner
+    runs-on: ${{ (vars.LISBON_POOL == 'github' || (github.event.pull_request.head.repo.full_name != '' && github.event.pull_request.head.repo.full_name != github.repository)) && 'ubuntu-24.04' || fromJSON('["self-hosted","linux","x64","lisbon"]') }}
+    timeout-minutes: 2
+    steps:
+      - run: echo "runner pool is chosen per job from vars.LISBON_POOL"
 
   build:
     runs-on: ${{ (vars.LISBON_POOL == 'github' || (github.event.pull_request.head.repo.full_name != '' && github.event.pull_request.head.repo.full_name != github.repository)) && 'ubuntu-24.04' || fromJSON('["self-hosted","linux","x64","lisbon"]') }}
